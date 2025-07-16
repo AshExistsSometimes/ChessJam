@@ -104,12 +104,15 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _LightCutoff: 0.01
+    - _MaxBrightness: 1
     - _Metallic: 0
+    - _MinBrightness: 0.3
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Shades: 0.47
     - _ShadowBrightness: 0.5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

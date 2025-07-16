@@ -426,3 +426,5 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 128
+  safeColor: {r: 1, g: 1, b: 1, a: 1}
+  dangerColor: {r: 0.83137256, g: 0.24313726, b: 0.15294118, a: 1}
