@@ -9,7 +9,8 @@ public class MoveButton : MonoBehaviour
     public Collider inputDetectCollider;
 
     [SerializeField] private LayerMask obstacleMask;
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private Color safeColor = Color.white;
+    [SerializeField] private Color dangerColor = Color.red;
 
     private SpriteRenderer spriteRenderer;
 
@@ -18,8 +19,7 @@ public class MoveButton : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         if (!overlapDetection || !groundDetection || !inputDetectCollider)
-
-        SetActive(false); // Initially hidden
+            SetActive(false); // Initially hidden
     }
 
     private void Update()
@@ -35,21 +35,40 @@ public class MoveButton : MonoBehaviour
 
     private void ValidatePosition()
     {
-        // Obstacle detection
         bool isBlocked = Physics.CheckBox(
-        overlapDetection.bounds.center,
-        overlapDetection.bounds.extents,
-        Quaternion.identity,
-        obstacleMask
+            overlapDetection.bounds.center,
+            overlapDetection.bounds.extents,
+            Quaternion.identity,
+            obstacleMask
         );
 
-        // Ground Detection
         bool hasGround = Physics.CheckBox(
             groundDetection.bounds.center,
             groundDetection.bounds.extents,
             Quaternion.identity,
-            groundMask
+            ~LayerMask.GetMask("IgnoreRaycast")
         );
+
+        bool isDangerous = false;
+
+        // Check for enemy offensive positions
+        Collider[] hits = Physics.OverlapBox(
+            overlapDetection.bounds.center,
+            overlapDetection.bounds.extents,
+            Quaternion.identity
+        );
+
+        foreach (var hit in hits)
+        {
+            EnemyMovePosition enemyPos = hit.GetComponent<EnemyMovePosition>();
+            if (enemyPos != null && enemyPos.OffensiveMovement)
+            {
+                isDangerous = true;
+                break;
+            }
+        }
+
+        spriteRenderer.color = isDangerous ? dangerColor : safeColor;
 
         SetActive(!isBlocked && hasGround);
     }
