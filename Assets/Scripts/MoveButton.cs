@@ -9,6 +9,7 @@ public class MoveButton : MonoBehaviour
     public Collider inputDetectCollider;
 
     [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private LayerMask groundMask;
 
     private SpriteRenderer spriteRenderer;
 
@@ -34,6 +35,7 @@ public class MoveButton : MonoBehaviour
 
     private void ValidatePosition()
     {
+        // Obstacle detection
         bool isBlocked = Physics.CheckBox(
         overlapDetection.bounds.center,
         overlapDetection.bounds.extents,
@@ -41,8 +43,13 @@ public class MoveButton : MonoBehaviour
         obstacleMask
         );
 
-
-        bool hasGround = Physics.CheckBox(groundDetection.bounds.center, groundDetection.bounds.extents, Quaternion.identity, ~LayerMask.GetMask("IgnoreRaycast"));
+        // Ground Detection
+        bool hasGround = Physics.CheckBox(
+            groundDetection.bounds.center,
+            groundDetection.bounds.extents,
+            Quaternion.identity,
+            groundMask
+        );
 
         SetActive(!isBlocked && hasGround);
     }

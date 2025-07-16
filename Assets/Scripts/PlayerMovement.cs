@@ -28,7 +28,6 @@ public class PlayerMovement : MonoBehaviour
                 MoveButton button = hit.collider.GetComponentInParent<MoveButton>();
                 if (button != null)
                 {
-                    Debug.Log($"Clicked on: {hit.collider.gameObject.name}");
                     MoveTo(button.transform.position);
                 }
             }
@@ -71,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         );
 
         // Step 5: Check for enemy collision
-        CheckEnemyKill();
+        CheckForEnemyOverlap();
 
         // Step 6: End turn
         GameManager.Instance.EndPlayerTurn();
@@ -93,15 +92,30 @@ public class PlayerMovement : MonoBehaviour
         transform.position = to;
     }
 
-    private void CheckEnemyKill()
+    private void CheckForEnemyOverlap()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, 0.4f);
-        foreach (var hit in hits)
+        Vector3 playerPos = transform.position;
+
+        foreach (EnemyAI enemy in GameManager.Instance.ActiveEnemies)
         {
-            if (hit.CompareTag("Enemy"))
+            if (enemy == null) continue;
+
+            if (Vector3.Distance(enemy.transform.position, playerPos) < 0.1f)
             {
-                Destroy(hit.gameObject); // or run enemy death logic
+                Debug.Log("Player overlapped enemy on player turn — destroying enemy!");
+                Destroy(enemy.gameObject);
+
+                // Optionally remove from active enemies list
+                GameManager.Instance.ActiveEnemies.Remove(enemy);
+                break;
             }
         }
+    }
+
+
+    public void HandleDeath()
+    {
+        Debug.Log("Player has died!");
+        // Add death animation, UI, reset level, or whatever you want here
     }
 }

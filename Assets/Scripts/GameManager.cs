@@ -5,53 +5,64 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance;
 
-    [Header("Turn State")]
     public bool PlayersTurn = true;
-    //public List<EnemyMovement> ActiveEnemies = new List<EnemyMovement>();
+    public List<EnemyAI> ActiveEnemies = new List<EnemyAI>();
+
+    public PlayerMovement Player { get; private set; }
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
 
-        Instance = this;
-        DontDestroyOnLoad(gameObject); // Optional for scene persistence
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+
+
+        Player = FindObjectOfType<PlayerMovement>();
+
+        if (Player == null)
+            Debug.LogError("PlayerMovement script not found in scene!");
+    }
+
+    private void Start()
+    {
+        StartCoroutine(GameLoop());
     }
 
     public void EndPlayerTurn()
     {
         PlayersTurn = false;
-        StartCoroutine(EnemyTurnRoutine());
     }
 
-    private IEnumerator EnemyTurnRoutine()
+    private IEnumerator GameLoop()
     {
-        // Let enemies react after a short delay
-        yield return new WaitForSeconds(0.1f);
+        while (true)
+        {
+            if (PlayersTurn)
+            {
+                // Wait for player to finish turn (signal elsewhere)
+                yield return new WaitUntil(() => !PlayersTurn);
+            }
+            else
+            {
+                // Enemy turns
+                foreach (EnemyAI enemy in ActiveEnemies)
+                {
+                    if (enemy != null)
+                        yield return enemy.TakeTurn();
+                }
 
-        //foreach (EnemyMovement enemy in ActiveEnemies)
-        //{
-        //    if (enemy != null)
-        //        yield return enemy.TakeTurn();
-        //}
+                // After all enemies moved, switch back to player turn after a short delay
+                yield return new WaitForSeconds(0.1f);
+                PlayersTurn = true;
+            }
 
-        //// Clear the list for next turn
-        //ActiveEnemies.Clear();
-
-        //// Small delay before returning control to player
-        //yield return new WaitForSeconds(0.1f);
-
-        PlayersTurn = true;
+            yield return null;
+        }
     }
 
-    //public void RegisterActiveEnemy(EnemyMovement enemy)
-    //{
-    //    if (!ActiveEnemies.Contains(enemy))
-    //        ActiveEnemies.Add(enemy);
-    //}
+    
 }
