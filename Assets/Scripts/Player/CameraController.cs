@@ -32,6 +32,12 @@ public class CameraController : MonoBehaviour
     public float followSmoothTime = 0.15f;
     public float followLerpDuration = 0.5f;
 
+    [Header("Zoom Settings")]
+    [Range(1f, 10f)] public float minZoom = 2f;
+    [Range(1f, 10f)] public float maxZoom = 5f;
+    public float zoomSpeed = 2f;
+    public float defaultZoom = 3.5f;
+
     // Internal state
     private float currentAngle;
     private float targetAngle;
@@ -46,6 +52,8 @@ public class CameraController : MonoBehaviour
 
     private Vector3 targetPosition;
 
+    private float targetZoom;
+
     void Start()
     {
         if (player == null) Debug.LogError("Player transform not assigned!");
@@ -59,12 +67,17 @@ public class CameraController : MonoBehaviour
         lerpStartPos = lerpTargetPos;
         targetPosition = lerpTargetPos;
 
+        targetZoom = Mathf.Clamp(defaultZoom, minZoom, maxZoom);
+        cam.orthographicSize = targetZoom;
+
         UpdateCameraPosition(immediate: true);
     }
 
     void Update()
     {
         HandleInput();
+
+        HandleZoomInput();
 
         HandleAngleLerp();
 
@@ -88,6 +101,22 @@ public class CameraController : MonoBehaviour
             angleIndex = prevIndex;
         }
     }
+
+
+    void HandleZoomInput()
+    {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.01f)
+        {
+            float direction = Mathf.Sign(-scroll);
+            targetZoom += direction * 0.5f;
+            targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+        }
+
+        // Smoothly lerp to the target zoom
+        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * 10f);
+    }
+
 
     void HandleAngleLerp()
     {

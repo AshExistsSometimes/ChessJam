@@ -179,6 +179,7 @@ public class EnemyAI : MonoBehaviour
         if (Vector3.Distance(enemyPos, playerPos) < 0.1f)
         {
             Debug.Log("Enemy overlapped player on enemy turn — player dies!");
+            GameManager.Instance.Player.playerModel.SetActive(false);
             GameManager.Instance.Player.HandleDeath();
         }
     }

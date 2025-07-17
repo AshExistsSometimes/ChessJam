@@ -4,16 +4,29 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public GameObject[] moveButtons;
     public float moveSpeed = 5f;
     public float liftHeight = 0.5f;
 
+    [Header("Death Settings")]
+    public GameObject playerModel;
+
     private bool isMoving = false;
+    public bool isDead = false;
 
     [SerializeField] private LayerMask moveButtonLayer;
 
+    private void Awake()
+    {
+        if (playerModel != null)
+            playerModel.SetActive(true);
+    }
+
     void Update()
     {
+        if (isDead) return; // No input if dead
+
         // Only allow input if it's the player's turn and they're not already moving
         if (!GameManager.Instance.PlayersTurn || isMoving) return;
 
@@ -102,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (Vector3.Distance(enemy.transform.position, playerPos) < 0.1f)
             {
-                Debug.Log("Player overlapped enemy on player turn — destroying enemy!");
+                Debug.Log($"Killed {enemy}");
                 Destroy(enemy.gameObject);
 
                 // Optionally remove from active enemies list
@@ -115,7 +128,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleDeath()
     {
-        Debug.Log("Player has died!");
-        // Add death animation, UI, reset level, or whatever you want here
+        if (isDead) return;
+        isDead = true;
+
+        if (playerModel != null)
+            playerModel.SetActive(false);
+
+        // Enable Death screen UI
     }
 }
