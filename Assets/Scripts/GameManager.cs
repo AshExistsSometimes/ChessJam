@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
 
         if (Player == null)
             Debug.LogError("PlayerMovement script not found in scene!");
+
+        GridOverlay.Instance.RefreshGrid();
     }
 
     private void Start()
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour
     public void EndPlayerTurn()
     {
         PlayersTurn = false;
+        GridOverlay.Instance.RefreshGrid();
     }
 
     private IEnumerator GameLoop()
