@@ -24,6 +24,11 @@ public class MainMenuController : MonoBehaviour
     public Vector2 mainMenuTargetPosition = new Vector2(200f, 0f);
     public Vector2 levelSelectTargetPosition = new Vector2(0f, 0f);
 
+    [Header("Sound")]
+    [Tooltip("Sound to play when a UI button is pressed.")]
+    public AudioClip pressSound;
+    private AudioSource audioSource;
+
     [System.Serializable]
     public struct LevelData
     {
@@ -35,6 +40,13 @@ public class MainMenuController : MonoBehaviour
     public LevelData[] levels;
 
     private bool titleFinished = false;
+
+
+    private void Awake()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+    }
 
     void Start()
     {
@@ -271,6 +283,18 @@ public class MainMenuController : MonoBehaviour
         if (instance != null)
         {
             Destroy(instance.gameObject);
+        }
+    }
+
+    public void PlayPressSound()
+    {
+        if (pressSound != null)
+        {
+            audioSource.PlayOneShot(pressSound);
+        }
+        else
+        {
+            Debug.LogWarning("MainMenuController: Press sound not assigned.");
         }
     }
 }
