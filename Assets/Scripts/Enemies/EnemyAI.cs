@@ -161,6 +161,8 @@ public class EnemyAI : MonoBehaviour
             yield return null;
         }
 
+        SoundManager.Instance.PlayPieceDropSound();
+
         // Snap to grid
         transform.position = new Vector3(
             Mathf.Round(target.x),

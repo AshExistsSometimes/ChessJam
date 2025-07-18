@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -16,6 +17,28 @@ public class PlayerMovement : MonoBehaviour
     public bool isDead = false;
 
     [SerializeField] private LayerMask moveButtonLayer;
+
+    private DeathScreen deathScreen;
+
+    private void Start()
+    {
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            transform.position = Vector3.zero;
+        }
+
+        FindDeathScreen();
+    }
+
+    void FindDeathScreen()
+    {
+        deathScreen = FindObjectOfType<DeathScreen>();
+
+        if (deathScreen == null)
+        {
+            Debug.LogWarning("DeathScreen not found by Player.");
+        }
+    }
 
     private void Awake()
     {
@@ -35,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (PauseMenuController.IsPaused) return;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, moveButtonLayer))
             {
@@ -45,6 +69,37 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void InitializePlayer()
+    {
+        isDead = false;
+
+        if (playerModel != null)
+            playerModel.SetActive(true);
+
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            transform.position = Vector3.zero;
+        }
+
+        // Re-enable this script in case it was disabled
+        this.enabled = true;
+
+        // Re-enable colliders if disabled
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = true;
+
+        // Re-enable rigidbody
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+            rb.isKinematic = true;
+
+        FindDeathScreen();
+
+        if (deathScreen == null)
+            Debug.LogWarning("Player: Could not find DeathScreen on scene load.");
     }
 
     public void MoveTo(Vector3 target)
@@ -74,6 +129,7 @@ public class PlayerMovement : MonoBehaviour
         // Step 3: Lower back down
         Vector3 lowered = new Vector3(target.x, startPos.y, target.z);
         yield return LerpPosition(moveXZ, lowered, moveSpeed);
+        SoundManager.Instance.PlayPieceDropSound();
 
         // Step 4: Snap to grid
         transform.position = new Vector3(
@@ -134,6 +190,13 @@ public class PlayerMovement : MonoBehaviour
         if (playerModel != null)
             playerModel.SetActive(false);
 
-        // Enable Death screen UI
+        if (deathScreen != null)
+        {
+            deathScreen.ShowDeathScreen();
+        }
+        else
+        {
+            Debug.LogWarning("Cannot show death screen: reference missing.");
+        }
     }
 }
