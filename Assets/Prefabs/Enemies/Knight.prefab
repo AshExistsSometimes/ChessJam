@@ -491,10 +491,8 @@ MonoBehaviour:
   - {fileID: 955505329670930035}
   - {fileID: 5460976436410453326}
   - {fileID: 5494562641730846719}
-  moveSpeed: 3
+  moveSpeed: 2
   liftHeight: 2
-  randomMoveChance: 60
-  moveOntoDangerousTileChance: 35
 --- !u!1 &7204654428244681970
 GameObject:
   m_ObjectHideFlags: 0

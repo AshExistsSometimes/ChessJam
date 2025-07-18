@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
@@ -54,6 +55,7 @@ public class CameraController : MonoBehaviour
 
     private float targetZoom;
 
+
     void Start()
     {
         if (player == null) Debug.LogError("Player transform not assigned!");
@@ -90,12 +92,14 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.D))
         {
+            if (PauseMenuController.IsPaused) return;
             int nextIndex = (angleIndex + 1) % horizontalAngles.Length;
             targetAngle = horizontalAngles[nextIndex];
             angleIndex = nextIndex;
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
+            if (PauseMenuController.IsPaused) return;
             int prevIndex = (angleIndex - 1 + horizontalAngles.Length) % horizontalAngles.Length;
             targetAngle = horizontalAngles[prevIndex];
             angleIndex = prevIndex;
@@ -108,6 +112,7 @@ public class CameraController : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (Mathf.Abs(scroll) > 0.01f)
         {
+            if (PauseMenuController.IsPaused) return;
             float direction = Mathf.Sign(-scroll);
             targetZoom += direction * 0.5f;
             targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);

@@ -56,13 +56,17 @@ MonoBehaviour:
   - 225
   - 270
   - 315
-  angleIndex: 4
+  angleIndex: 5
   verticalAngle: 45
   distance: 9
   height: 2
   rotationLerpSpeed: 8
   followSmoothTime: 0.1
   followLerpDuration: 0.5
+  minZoom: 3
+  maxZoom: 6
+  zoomSpeed: 2
+  defaultZoom: 3.5
 --- !u!1 &7170377253862452735
 GameObject:
   m_ObjectHideFlags: 0

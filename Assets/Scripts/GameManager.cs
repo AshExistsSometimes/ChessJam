@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class GameManager : MonoBehaviour
@@ -15,23 +16,49 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
 
+        // INSTANTIATION
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else
+        {
             Destroy(gameObject);
+            return;
+        }
+
+        // Destroy if this is the Main Menu scene
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            Destroy(gameObject);
+        }
 
 
         Player = FindObjectOfType<PlayerMovement>();
 
         if (Player == null)
             Debug.LogError("PlayerMovement script not found in scene!");
-
-        GridOverlay.Instance.RefreshGrid();
     }
 
     private void Start()
     {
         StartCoroutine(GameLoop());
+
+        GridOverlay.Instance?.RefreshGrid();
+    }
+
+    private void Update()
+    {
+        if (!PlayersTurn && ActiveEnemies.Count == 0)
+        {
+            PlayersTurn = true;
+        }
+
+        if (Player == null)
+        {
+            Player = FindObjectOfType<PlayerMovement>();
+        }
     }
 
     public void EndPlayerTurn()
