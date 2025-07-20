@@ -100,6 +100,7 @@ public class MainMenuController : MonoBehaviour
 
     IEnumerator FadeOutTitleAndShowMainMenu()
     {
+        audioSource.PlayOneShot(pressSound);
         titleFinished = true;
         float timer = 0f;
         while (timer < fadeDuration)
